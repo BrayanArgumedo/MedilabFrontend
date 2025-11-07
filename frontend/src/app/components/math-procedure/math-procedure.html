@@ -1,0 +1,55 @@
+<!--src/app/components/math-procedure/math-procedure.html-->
+<div class="math-procedure" *ngIf="steps.length > 0">
+  
+  <div class="procedure-header">
+    <h2>🧮 Procedimiento Matemático Completo</h2>
+    <p class="header-description">
+      Desarrollo paso a paso de los cálculos farmacocinéticos aplicados a este paciente
+    </p>
+  </div>
+
+  <div class="steps-container">
+    
+    <div class="step-card" *ngFor="let step of steps; let i = index">
+      
+      <div class="step-number">{{ step.number }}</div>
+      
+      <div class="step-content">
+        
+        <h3 class="step-title">{{ step.title }}</h3>
+        
+        <div class="formula-box" *ngIf="step.formula">
+          <div class="formula-label">Fórmula:</div>
+          <div class="formula-text">{{ step.formula }}</div>
+        </div>
+
+        <div class="calculation-box" *ngIf="step.calculation">
+          <div class="calculation-label">Cálculo:</div>
+          <pre class="calculation-text">{{ step.calculation }}</pre>
+        </div>
+
+        <div class="result-box">
+          <div class="result-icon">✅</div>
+          <div class="result-text">{{ step.result }}</div>
+        </div>
+
+        <div class="explanation-box">
+          <div class="explanation-icon">💡</div>
+          <div class="explanation-text">{{ step.explanation }}</div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="procedure-footer">
+    <div class="footer-note">
+      <strong>Nota:</strong> Todos los cálculos se basan en modelos farmacocinéticos 
+      estándar y deben ser validados por un profesional de la salud antes de aplicarse 
+      en práctica clínica.
+    </div>
+  </div>
+
+</div>

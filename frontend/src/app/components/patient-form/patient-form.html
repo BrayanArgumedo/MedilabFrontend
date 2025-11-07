@@ -1,0 +1,226 @@
+<div class="patient-form">
+  <div class="form-header">
+    <h2>🩺 Datos del Paciente - Evaluación Renal</h2>
+    <p class="form-description">
+      Ingrese los datos del paciente para calcular la función renal y ajustar la dosificación
+    </p>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" class="form-content">
+    
+    <!-- Fila 1: Peso y Edad -->
+    <div class="form-row">
+      
+      <!-- Campo: Peso -->
+      <div class="form-field">
+        <label for="weight" class="field-label">
+          Peso del Paciente
+          <span class="required">*</span>
+        </label>
+        <div class="input-with-tooltip">
+          <div class="input-wrapper">
+            <input 
+              type="number" 
+              id="weight"
+              [(ngModel)]="patientData.weight"
+              (ngModelChange)="onWeightChange()"
+              name="weight"
+              min="1"
+              max="500"
+              step="0.1"
+              required
+              class="form-input"
+              placeholder="70">
+            <span class="input-unit">kg</span>
+          </div>
+          <div class="tooltip-icon" title="Peso corporal en kilogramos. Usado para calcular TFG y volumen de distribución.">
+            ❓
+          </div>
+        </div>
+        <small class="field-hint">Entre 1 y 500 kg</small>
+      </div>
+
+      <!-- Campo: Edad -->
+      <div class="form-field">
+        <label for="age" class="field-label">
+          Edad del Paciente
+          <span class="required">*</span>
+        </label>
+        <div class="input-with-tooltip">
+          <div class="input-wrapper">
+            <input 
+              type="number" 
+              id="age"
+              [(ngModel)]="patientData.age"
+              (ngModelChange)="onAgeChange()"
+              name="age"
+              min="1"
+              max="120"
+              required
+              class="form-input"
+              placeholder="65">
+            <span class="input-unit">años</span>
+          </div>
+          <div class="tooltip-icon" title="Edad del paciente. Necesaria para calcular TFG con Cockcroft-Gault.">
+            ❓
+          </div>
+        </div>
+        <small class="field-hint">Requerido para cálculo de TFG</small>
+      </div>
+
+    </div>
+
+    <!-- Fila 2: Sexo y Creatinina -->
+    <div class="form-row">
+      
+      <!-- Campo: Sexo -->
+      <div class="form-field">
+        <label for="sex" class="field-label">
+          Sexo Biológico
+          <span class="required">*</span>
+        </label>
+        <div class="input-with-tooltip">
+          <select 
+            id="sex"
+            [(ngModel)]="patientData.sex"
+            (ngModelChange)="onSexChange()"
+            name="sex"
+            required
+            class="form-select">
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+          </select>
+          <div class="tooltip-icon" title="El sexo biológico afecta el cálculo de TFG (factor 0.85 para mujeres).">
+            ❓
+          </div>
+        </div>
+      </div>
+
+      <!-- Campo: Creatinina Sérica -->
+      <div class="form-field">
+        <label for="creatinine" class="field-label">
+          Creatinina Sérica
+          <span class="required">*</span>
+        </label>
+        <div class="input-with-tooltip">
+          <div class="input-wrapper">
+            <input 
+              type="number" 
+              id="creatinine"
+              [(ngModel)]="patientData.serum_creatinine"
+              (ngModelChange)="onCreatinineChange()"
+              name="creatinine"
+              min="0.1"
+              max="20"
+              step="0.1"
+              required
+              class="form-input"
+              placeholder="1.2">
+            <span class="input-unit">mg/dL</span>
+          </div>
+          <div class="tooltip-icon" title="Nivel de creatinina en sangre. Valor normal: 0.7-1.3 mg/dL. Valores altos indican disfunción renal.">
+            ❓
+          </div>
+        </div>
+        <small class="field-hint">Normal: 0.7-1.3 mg/dL</small>
+      </div>
+
+    </div>
+
+    <!-- Resultado TFG -->
+    <div class="gfr-result" *ngIf="patientData.calculated_gfr > 0">
+      <div class="gfr-header">
+        <h3>📊 Tasa de Filtración Glomerular (TFG)</h3>
+      </div>
+      
+      <div class="gfr-value" [ngClass]="getAlertLevel()">
+        <div class="gfr-number">{{ patientData.calculated_gfr }} <span class="unit">mL/min/1.73m²</span></div>
+        <div class="gfr-stage" [style.color]="getCurrentStageInfo()?.color">
+          {{ getCurrentStageInfo()?.stage }}: {{ getCurrentStageInfo()?.severity }}
+        </div>
+      </div>
+
+      <div class="stage-details" *ngIf="getCurrentStageInfo()">
+        <div class="detail-item">
+          <strong>Rango TFG:</strong> {{ getCurrentStageInfo()?.gfr_range }} mL/min
+        </div>
+        <div class="detail-item">
+          <strong>Ajuste de dosis:</strong> {{ (getCurrentStageInfo()?.adjustment! * 100) }}%
+        </div>
+        <div class="detail-item">
+          <strong>Monitoreo:</strong> {{ getCurrentStageInfo()?.monitoring }}
+        </div>
+      </div>
+
+      <!-- Alertas médicas -->
+      <div class="medical-alert" *ngIf="patientData.calculated_gfr < 60">
+        <div class="alert-icon" [ngClass]="getAlertLevel()">⚠️</div>
+        <div class="alert-content">
+          <strong *ngIf="patientData.calculated_gfr >= 30">Precaución Moderada</strong>
+          <strong *ngIf="patientData.calculated_gfr < 30">⛔ Alto Riesgo</strong>
+          <p *ngIf="patientData.calculated_gfr >= 30">
+            Enfermedad Renal Crónica moderada. Ajustar dosis de medicamentos y monitorear función renal regularmente.
+          </p>
+          <p *ngIf="patientData.calculated_gfr < 30 && patientData.calculated_gfr >= 15">
+            Enfermedad Renal Crónica severa. Requiere ajuste significativo de dosis y monitoreo estrecho. Considerar preparación para terapia de reemplazo renal.
+          </p>
+          <p *ngIf="patientData.calculated_gfr < 15">
+            Falla Renal Terminal. Requiere diálisis. Ajustes críticos en medicación necesarios.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campo: Diálisis -->
+    <div class="form-field" *ngIf="patientData.calculated_gfr < 30 && patientData.calculated_gfr > 0">
+      <label class="field-label checkbox-label">
+        <input 
+          type="checkbox" 
+          [(ngModel)]="patientData.on_dialysis"
+          name="on_dialysis">
+        <span>Paciente en diálisis</span>
+      </label>
+
+      <select 
+        *ngIf="patientData.on_dialysis"
+        [(ngModel)]="patientData.dialysis_type"
+        name="dialysis_type"
+        class="form-select">
+        <option *ngFor="let type of dialysisTypes" [value]="type.value">
+          {{ type.label }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-secondary"
+        (click)="onCancel()">
+        ← Cancelar
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="!isValid()">
+        Siguiente: Medicamento →
+      </button>
+    </div>
+
+  </form>
+
+  <!-- Preview de datos -->
+  <div class="data-preview" *ngIf="isValid()">
+    <h4>📋 Resumen del Paciente:</h4>
+    <ul>
+      <li><strong>Peso:</strong> {{ patientData.weight }} kg</li>
+      <li><strong>Edad:</strong> {{ patientData.age }} años</li>
+      <li><strong>Sexo:</strong> {{ patientData.sex === 'M' ? 'Masculino' : 'Femenino' }}</li>
+      <li><strong>Creatinina:</strong> {{ patientData.serum_creatinine }} mg/dL</li>
+      <li><strong>TFG:</strong> {{ patientData.calculated_gfr }} mL/min</li>
+      <li><strong>Estadio:</strong> {{ patientData.renal_stage }} - {{ getCurrentStageInfo()?.severity }}</li>
+    </ul>
+  </div>
+
+</div>

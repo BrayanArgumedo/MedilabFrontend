@@ -1,0 +1,79 @@
+<!--src/app/components/next-dose-card/next-dose-card.html-->
+<div class="next-dose-card" [class]="getStatusColor()" *ngIf="simulationData">
+  
+  <div class="card-header">
+    <div class="icon">⏰</div>
+    <h3>Próxima Dosis Recomendada</h3>
+  </div>
+
+  <div class="card-body">
+    
+    <!-- Tiempo principal -->
+    <div class="main-time">
+      <div class="time-value">{{ formatTime(nextDoseTime) }}</div>
+      <div class="time-label">hasta próxima dosis</div>
+    </div>
+
+    <!-- Barra de progreso -->
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="getProgressPercentage()"></div>
+    </div>
+
+    <!-- Información detallada -->
+    <div class="dose-info">
+      <div class="info-row">
+        <span class="info-icon">📊</span>
+        <span class="info-text">
+          El medicamento alcanzará el nivel terapéutico mínimo 
+          ({{ therapeuticMinLevel }} mg/L) en {{ formatTime(nextDoseTime) }}
+        </span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-icon">📅</span>
+        <span class="info-text">
+          <strong>Fecha estimada:</strong> {{ formatDate(nextDoseDate) }}
+        </span>
+      </div>
+
+      <div class="info-row status" [class]="getStatusColor()">
+        <span class="info-icon">{{ getStatusIcon() }}</span>
+        <span class="info-text">
+          <strong>Estado:</strong> {{ getStatusText() }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Recomendaciones -->
+    <div class="recommendations">
+      <h4>💡 Recomendaciones:</h4>
+      <ul>
+        <li *ngIf="getStatusColor() === 'success'">
+          El paciente está dentro del rango terapéutico
+        </li>
+        <li *ngIf="getStatusColor() === 'warning'">
+          Preparar la próxima dosis con anticipación
+        </li>
+        <li *ngIf="getStatusColor() === 'danger'">
+          Atención: El nivel terapéutico está próximo a finalizar
+        </li>
+        <li>Monitorear signos vitales del paciente</li>
+        <li>Verificar función renal antes de administrar siguiente dosis</li>
+      </ul>
+    </div>
+
+    <!-- Botón de acción (opcional) -->
+    <div class="card-actions">
+      <button class="btn-reminder">
+        <span class="btn-icon">🔔</span>
+        Programar Recordatorio
+      </button>
+      <button class="btn-print">
+        <span class="btn-icon">🖨️</span>
+        Imprimir Indicación
+      </button>
+    </div>
+
+  </div>
+
+</div>

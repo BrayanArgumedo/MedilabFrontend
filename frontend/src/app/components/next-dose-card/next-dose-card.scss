@@ -1,0 +1,300 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.next-dose-card {
+  background: $white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-xl;
+  overflow: hidden;
+  margin-bottom: $spacing-xl;
+  border: 3px solid $success;
+  transition: all $transition-base;
+
+  &.warning {
+    border-color: $warning;
+  }
+
+  &.danger {
+    border-color: $danger;
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, $success, lighten($success, 10%));
+    padding: $spacing-lg $spacing-xl;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    color: $white;
+
+    .icon {
+      font-size: 2rem;
+      animation: pulse 2s infinite;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+  }
+
+  &.warning .card-header {
+    background: linear-gradient(135deg, $warning, lighten($warning, 10%));
+  }
+
+  &.danger .card-header {
+    background: linear-gradient(135deg, $danger, lighten($danger, 10%));
+  }
+
+  .card-body {
+    padding: $spacing-xl;
+  }
+
+  .main-time {
+    text-align: center;
+    margin-bottom: $spacing-lg;
+    padding: $spacing-xl;
+    background: lighten($success, 48%);
+    border-radius: $radius-lg;
+    border: 2px solid lighten($success, 40%);
+
+    .time-value {
+      font-size: 3rem;
+      font-weight: 700;
+      color: $success;
+      line-height: 1;
+      margin-bottom: $spacing-sm;
+    }
+
+    .time-label {
+      font-size: 1rem;
+      color: $gray-600;
+      font-weight: 600;
+    }
+  }
+
+  &.warning .main-time {
+    background: lighten($warning, 48%);
+    border-color: lighten($warning, 40%);
+
+    .time-value {
+      color: $warning;
+    }
+  }
+
+  &.danger .main-time {
+    background: lighten($danger, 48%);
+    border-color: lighten($danger, 40%);
+
+    .time-value {
+      color: $danger;
+    }
+  }
+
+  .progress-bar {
+    height: 12px;
+    background: $gray-200;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: $spacing-xl;
+    position: relative;
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, $success, lighten($success, 15%));
+      transition: width 1s ease-out;
+      border-radius: 6px;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, 
+          transparent, 
+          rgba(255, 255, 255, 0.3), 
+          transparent);
+        animation: shimmer 2s infinite;
+      }
+    }
+  }
+
+  &.warning .progress-fill {
+    background: linear-gradient(90deg, $warning, lighten($warning, 15%));
+  }
+
+  &.danger .progress-fill {
+    background: linear-gradient(90deg, $danger, lighten($danger, 15%));
+  }
+
+  .dose-info {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    margin-bottom: $spacing-xl;
+
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: $spacing-md;
+      padding: $spacing-md;
+      background: $gray-100;
+      border-radius: $radius-md;
+      transition: all $transition-base;
+
+      &:hover {
+        background: lighten($primary, 48%);
+      }
+
+      .info-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+      }
+
+      .info-text {
+        flex: 1;
+        color: $dark;
+        font-size: 0.95rem;
+        line-height: 1.6;
+
+        strong {
+          font-weight: 700;
+          color: $primary;
+        }
+      }
+
+      &.status {
+        font-weight: 600;
+
+        &.success {
+          background: lighten($success, 48%);
+          border-left: 4px solid $success;
+        }
+
+        &.warning {
+          background: lighten($warning, 48%);
+          border-left: 4px solid $warning;
+        }
+
+        &.danger {
+          background: lighten($danger, 48%);
+          border-left: 4px solid $danger;
+        }
+      }
+    }
+  }
+
+  .recommendations {
+    background: lighten($secondary, 48%);
+    padding: $spacing-lg;
+    border-radius: $radius-md;
+    border-left: 4px solid $secondary;
+    margin-bottom: $spacing-lg;
+
+    h4 {
+      margin: 0 0 $spacing-md 0;
+      color: $secondary;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: $spacing-lg;
+      list-style: none;
+
+      li {
+        position: relative;
+        padding-left: $spacing-md;
+        margin-bottom: $spacing-sm;
+        color: $dark;
+        font-size: 0.9rem;
+        line-height: 1.6;
+
+        &::before {
+          content: '✓';
+          position: absolute;
+          left: 0;
+          color: $secondary;
+          font-weight: 700;
+        }
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  .card-actions {
+    display: flex;
+    gap: $spacing-md;
+    justify-content: center;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+
+    button {
+      flex: 1;
+      padding: $spacing-md $spacing-lg;
+      border: none;
+      border-radius: $radius-md;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all $transition-base;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $spacing-sm;
+
+      .btn-icon {
+        font-size: 1.25rem;
+      }
+
+      &.btn-reminder {
+        background: $primary;
+        color: $white;
+
+        &:hover {
+          background: darken($primary, 10%);
+          transform: translateY(-2px);
+          box-shadow: $shadow-lg;
+        }
+      }
+
+      &.btn-print {
+        background: $white;
+        color: $primary;
+        border: 2px solid $primary;
+
+        &:hover {
+          background: lighten($primary, 48%);
+          transform: translateY(-2px);
+        }
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}

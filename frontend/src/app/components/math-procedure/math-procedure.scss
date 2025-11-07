@@ -1,0 +1,189 @@
+//src/app/components/math-procedure/math-procedure.scss
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.math-procedure {
+  background: $white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-xl;
+
+  .procedure-header {
+    text-align: center;
+    margin-bottom: $spacing-xl;
+    padding-bottom: $spacing-lg;
+    border-bottom: 3px solid $primary;
+
+    h2 {
+      color: $primary;
+      font-size: 2rem;
+      margin-bottom: $spacing-sm;
+      font-weight: 700;
+    }
+
+    .header-description {
+      color: $gray-600;
+      font-size: 1rem;
+      line-height: 1.6;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+  }
+
+  .steps-container {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  .step-card {
+    background: lighten($primary, 50%);
+    border-radius: $radius-lg;
+    padding: $spacing-lg;
+    border: 2px solid lighten($primary, 45%);
+    display: flex;
+    gap: $spacing-lg;
+    transition: all $transition-base;
+
+    &:hover {
+      transform: translateX(8px);
+      box-shadow: $shadow-lg;
+      border-color: $primary;
+    }
+
+    .step-number {
+      font-size: 3rem;
+      flex-shrink: 0;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: $white;
+      border-radius: 50%;
+      box-shadow: $shadow-md;
+    }
+
+    .step-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-md;
+    }
+
+    .step-title {
+      color: $primary;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .formula-box {
+      background: lighten($secondary, 50%);
+      padding: $spacing-md;
+      border-radius: $radius-md;
+      border-left: 4px solid $secondary;
+
+      .formula-label {
+        font-weight: 700;
+        color: $secondary;
+        font-size: 0.9rem;
+        margin-bottom: $spacing-xs;
+      }
+
+      .formula-text {
+        font-family: 'Courier New', monospace;
+        font-size: 1.1rem;
+        color: $dark;
+        font-weight: 600;
+      }
+    }
+
+    .calculation-box {
+      background: lighten($info, 50%);
+      padding: $spacing-md;
+      border-radius: $radius-md;
+      border-left: 4px solid $info;
+
+      .calculation-label {
+        font-weight: 700;
+        color: $info;
+        font-size: 0.9rem;
+        margin-bottom: $spacing-xs;
+      }
+
+      .calculation-text {
+        font-family: 'Courier New', monospace;
+        font-size: 0.95rem;
+        color: $dark;
+        margin: 0;
+        white-space: pre-wrap;
+        line-height: 1.6;
+      }
+    }
+
+    .result-box {
+      background: lighten($success, 48%);
+      padding: $spacing-md;
+      border-radius: $radius-md;
+      border-left: 4px solid $success;
+      display: flex;
+      align-items: center;
+      gap: $spacing-md;
+
+      .result-icon {
+        font-size: 1.5rem;
+      }
+
+      .result-text {
+        flex: 1;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: $success;
+      }
+    }
+
+    .explanation-box {
+      background: lighten($warning, 50%);
+      padding: $spacing-md;
+      border-radius: $radius-md;
+      border-left: 4px solid $warning;
+      display: flex;
+      gap: $spacing-md;
+
+      .explanation-icon {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+      }
+
+      .explanation-text {
+        flex: 1;
+        color: $dark;
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+    }
+  }
+
+  .procedure-footer {
+    margin-top: $spacing-xl;
+    padding-top: $spacing-lg;
+    border-top: 2px solid $gray-200;
+
+    .footer-note {
+      background: lighten($danger, 48%);
+      padding: $spacing-md;
+      border-radius: $radius-md;
+      border-left: 4px solid $danger;
+      color: $dark;
+      font-size: 0.9rem;
+      line-height: 1.6;
+
+      strong {
+        color: $danger;
+        font-weight: 700;
+      }
+    }
+  }
+}

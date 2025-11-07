@@ -1,0 +1,115 @@
+<div class="solver-page">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <h1>💊 MediLab Control - Calculadora de Farmacocinética</h1>
+    <p>Calcula concentraciones de medicamentos usando ecuaciones diferenciales</p>
+  </div>
+
+  <!-- Stepper -->
+  <app-stepper [currentStep]="currentStep" [totalSteps]="totalSteps"></app-stepper>
+
+  <!-- CONTENIDO SEGÚN EL PASO -->
+  <div class="wizard-content">
+
+    <!-- PASO 1: Datos del Paciente -->
+    <app-patient-form 
+      *ngIf="currentStep === 1"
+      (dataSubmitted)="onPatientDataSubmitted($event)"
+      (cancel)="onCancel()">
+    </app-patient-form>
+
+    <!-- PASO 2: Medicamento y Dosis -->
+    <app-medication-form
+      *ngIf="currentStep === 2"
+      [patientData]="patientData"
+      (dataSubmitted)="onMedicationDataSubmitted($event)"
+      (back)="previousStep()">
+    </app-medication-form>
+
+    <!-- PASO 3: Configuración de Análisis -->
+    <app-analysis-config
+      *ngIf="currentStep === 3"
+      [patientData]="patientData"
+      [medicationData]="medicationData"
+      (dataSubmitted)="onConfigDataSubmitted($event)"
+      (back)="previousStep()">
+    </app-analysis-config>
+
+    <!-- PASO 4: Resultados -->
+    <div *ngIf="currentStep === 4" class="results-container">
+      
+      <div class="results-header">
+        <h2>📊 Resultados de la Simulación</h2>
+        <button class="btn-new-simulation" (click)="onCancel()">
+          🔄 Nueva Simulación
+        </button>
+      </div>
+
+      <div class="results-grid" *ngIf="simulationData">
+        
+        <!-- HERO CARD: PRÓXIMA DOSIS -->
+        <div class="result-item full-width">
+          <app-next-dose-card [simulationData]="simulationData"></app-next-dose-card>
+        </div>
+
+        <!-- PESTAÑAS DE NAVEGACIÓN -->
+        <div class="result-item full-width">
+          <div class="tabs-container">
+            <div class="tabs-header">
+              <button 
+                class="tab-button"
+                [class.active]="activeTab === 'graph'"
+                (click)="activeTab = 'graph'">
+                📈 Gráfica
+              </button>
+              <button 
+                class="tab-button"
+                [class.active]="activeTab === 'procedure'"
+                (click)="activeTab = 'procedure'">
+                🧮 Procedimiento
+              </button>
+              <button 
+                class="tab-button"
+                [class.active]="activeTab === 'results'"
+                (click)="activeTab = 'results'">
+                📋 Resultados
+              </button>
+            </div>
+
+            <div class="tabs-content">
+              
+              <!-- TAB 1: GRÁFICA -->
+              <div class="tab-panel" *ngIf="activeTab === 'graph'">
+                <app-chart-display [data]="simulationData"></app-chart-display>
+              </div>
+
+              <!-- TAB 2: PROCEDIMIENTO MATEMÁTICO -->
+              <div class="tab-panel" *ngIf="activeTab === 'procedure'">
+                <app-math-procedure 
+                  [simulationData]="simulationData"
+                  [patientData]="patientData"
+                  [medicationData]="medicationData">
+                </app-math-procedure>
+              </div>
+
+              <!-- TAB 3: RESULTADOS NUMÉRICOS -->
+              <div class="tab-panel" *ngIf="activeTab === 'results'">
+                <app-results-panel [data]="simulationData"></app-results-panel>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="no-data" *ngIf="!simulationData">
+        <p>⚠️ No hay datos para mostrar</p>
+        <button (click)="onCancel()">Volver al inicio</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

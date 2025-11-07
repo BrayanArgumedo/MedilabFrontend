@@ -1,0 +1,226 @@
+// src/app/pages/solver/solver.scss 
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.solver-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      color: #1f2937;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #6b7280;
+      font-size: 1.1rem;
+    }
+  }
+
+  .solver-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+
+    .grid-item {
+      &.full-width {
+        grid-column: 1 / -1;
+      }
+
+      &.placeholder {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .placeholder-content {
+          text-align: center;
+          color: #9ca3af;
+
+          h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+          }
+
+          p {
+            font-size: 1rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .solver-page {
+    padding: 1rem;
+
+    .page-header h1 {
+      font-size: 1.8rem;
+    }
+
+    .solver-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+}
+
+.wizard-content {
+  margin-top: $spacing-xl;
+}
+
+.step-container {
+  max-width: 700px;
+  margin: 0 auto;
+  
+  .btn-back {
+    margin-top: $spacing-lg;
+    padding: $spacing-md $spacing-lg;
+    background: $white;
+    border: 2px solid $gray-300;
+    border-radius: $radius-md;
+    color: $gray-600;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all $transition-base;
+    
+    &:hover {
+      background: $gray-100;
+      border-color: $gray-400;
+    }
+  }
+}
+
+.results-container {
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-xl;
+    padding: $spacing-lg;
+    background: $white;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+
+    h2 {
+      margin: 0;
+      color: $primary;
+    }
+
+    .btn-new-simulation {
+      padding: $spacing-md $spacing-xl;
+      background: $primary;
+      color: $white;
+      border: none;
+      border-radius: $radius-md;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all $transition-base;
+
+      &:hover {
+        background: darken($primary, 10%);
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  .results-grid {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+
+    .result-item {
+      background: $white;
+      border-radius: $radius-lg;
+      padding: $spacing-lg;
+      box-shadow: $shadow-md;
+
+      &.full-width {
+        width: 100%;
+      }
+    }
+  }
+
+  .no-data {
+    text-align: center;
+    padding: $spacing-2xl;
+    background: $white;
+    border-radius: $radius-lg;
+
+    button {
+      margin-top: $spacing-lg;
+      padding: $spacing-md $spacing-xl;
+      background: $primary;
+      color: $white;
+      border: none;
+      border-radius: $radius-md;
+      cursor: pointer;
+    }
+  }
+}
+
+// PESTAÑAS
+.tabs-container {
+  background: $white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+  overflow: hidden;
+
+  .tabs-header {
+    display: flex;
+    background: $gray-100;
+    border-bottom: 2px solid $gray-200;
+
+    .tab-button {
+      flex: 1;
+      padding: $spacing-lg;
+      background: transparent;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      color: $gray-600;
+      cursor: pointer;
+      transition: all $transition-base;
+      border-bottom: 3px solid transparent;
+
+      &:hover {
+        background: lighten($primary, 48%);
+        color: $primary;
+      }
+
+      &.active {
+        background: $white;
+        color: $primary;
+        border-bottom-color: $primary;
+      }
+    }
+  }
+
+  .tabs-content {
+    .tab-panel {
+      animation: fadeIn 0.3s ease;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

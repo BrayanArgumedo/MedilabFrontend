@@ -1,0 +1,82 @@
+<!--src/app/pages/history/history.html-->
+<div class="history-page">
+  
+  <div class="page-header">
+    <h1>📊 Historial de Simulaciones</h1>
+    <p>Consulta y compara simulaciones anteriores</p>
+  </div>
+
+  <div class="actions-bar">
+    <button class="btn-new" (click)="newSimulation()">
+      ➕ Nueva Simulación
+    </button>
+    <button 
+      class="btn-compare"
+      [disabled]="selectedSimulations.length !== 2"
+      (click)="compareSelected()">
+      👥 Comparar Seleccionadas ({{ selectedSimulations.length }}/2)
+    </button>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando historial...</p>
+  </div>
+
+  <div class="simulations-table" *ngIf="!loading && simulations.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th width="50">
+            <input type="checkbox" disabled title="Seleccionar todo">
+          </th>
+          <th>Fecha</th>
+          <th>Paciente</th>
+          <th>TFG</th>
+          <th>Estadio</th>
+          <th>Medicamento</th>
+          <th>Dosis</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let sim of simulations" [class.selected]="isSelected(sim)">
+          <td>
+            <input 
+              type="checkbox"
+              [checked]="isSelected(sim)"
+              (change)="onCheckboxChange(sim, $event)">
+          </td>
+          <td>{{ formatDate(sim.created_at) }}</td>
+          <td>{{ sim.patient_weight }}kg, {{ sim.patient_age }}a</td>
+          <td>{{ sim.calculated_gfr || '--' }} mL/min</td>
+          <td>
+            <span class="badge" [class]="getRenalStage(sim)">
+              {{ getRenalStage(sim) }}
+            </span>
+          </td>
+          <td>{{ getMedicationName(sim) }}</td>
+          <td>{{ sim.dose_administered }}mg</td>
+          <td class="actions">
+            <button class="btn-view" (click)="viewSimulation(sim)" title="Ver detalles">
+              👁️
+            </button>
+            <button class="btn-delete" (click)="deleteSimulation(sim)" title="Eliminar">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="no-data" *ngIf="!loading && simulations.length === 0">
+    <div class="no-data-icon">📭</div>
+    <h3>No hay simulaciones guardadas</h3>
+    <p>Crea tu primera simulación para comenzar</p>
+    <button class="btn-new" (click)="newSimulation()">
+      ➕ Nueva Simulación
+    </button>
+  </div>
+
+</div>

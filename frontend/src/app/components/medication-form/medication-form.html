@@ -1,0 +1,228 @@
+<div class="medication-form">
+  
+  <!-- Header -->
+  <div class="form-header">
+    <h2>💊 Selección de Medicamento y Dosis</h2>
+    <p class="form-description">
+      Seleccione el medicamento y dosis. El sistema ajustará automáticamente según la función renal del paciente.
+    </p>
+  </div>
+
+  <!-- Información del paciente -->
+  <div class="patient-summary" *ngIf="patientData">
+    <div class="summary-item">
+      <span class="label">Paciente:</span>
+      <span class="value">{{ patientData.weight }} kg, {{ patientData.age }} años</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">TFG:</span>
+      <span class="value">{{ patientData.calculated_gfr }} mL/min</span>
+    </div>
+    <div class="summary-item">
+      <span class="label">Estadio:</span>
+      <span class="value">{{ patientData.renal_stage }}</span>
+    </div>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" class="form-content">
+    
+    <!-- Campo: Medicamento -->
+    <div class="form-field">
+      <label for="medication" class="field-label">
+        Medicamento
+        <span class="required">*</span>
+      </label>
+      <div class="input-with-tooltip">
+        <select 
+          id="medication"
+          [(ngModel)]="medicationData.medication"
+          name="medication"
+          required
+          class="form-select">
+          <option value="">Seleccione un medicamento...</option>
+          <optgroup label="Analgésicos y Antiinflamatorios">
+            <option *ngFor="let med of medications | slice:0:4" [value]="med.id">
+              {{ med.name }} ({{ med.category }})
+            </option>
+          </optgroup>
+          <optgroup label="Antibióticos">
+            <option *ngFor="let med of medications | slice:4:9" [value]="med.id">
+              {{ med.name }} ({{ med.category }})
+            </option>
+          </optgroup>
+          <optgroup label="Cardiovasculares">
+            <option *ngFor="let med of medications | slice:9:12" [value]="med.id">
+              {{ med.name }} ({{ med.category }})
+            </option>
+          </optgroup>
+          <optgroup label="Otros">
+            <option *ngFor="let med of medications | slice:12:15" [value]="med.id">
+              {{ med.name }} ({{ med.category }})
+            </option>
+          </optgroup>
+        </select>
+        <div class="tooltip-icon" title="Seleccione el medicamento a administrar">
+          ❓
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del medicamento seleccionado -->
+    <div class="medication-info" *ngIf="getSelectedMedication()">
+      <div class="info-header">
+        <h3>📋 Información del Medicamento</h3>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <strong>Categoría:</strong>
+          <span>{{ getSelectedMedication()?.category }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Vida Media:</strong>
+          <span>{{ getSelectedMedication()?.half_life }} horas</span>
+        </div>
+        <div class="info-item">
+          <strong>Constante k:</strong>
+          <span>{{ getSelectedMedication()?.k }} /hora</span>
+        </div>
+      </div>
+
+      <!-- Advertencia del medicamento -->
+      <div class="medication-warning" 
+           [ngClass]="getAlertLevel()"
+           *ngIf="getSelectedMedication()?.warning">
+        <div class="warning-icon">
+          <span *ngIf="getAlertLevel() === 'safe'">✅</span>
+          <span *ngIf="getAlertLevel() === 'warning'">⚠️</span>
+          <span *ngIf="getAlertLevel() === 'danger'">⛔</span>
+          <span *ngIf="getAlertLevel() === 'contraindicated'">🚫</span>
+        </div>
+        <div class="warning-content">
+          <strong *ngIf="isContraindicated()">MEDICAMENTO CONTRAINDICADO</strong>
+          <strong *ngIf="!isContraindicated() && getAlertLevel() === 'danger'">Alto Riesgo</strong>
+          <strong *ngIf="getAlertLevel() === 'warning'">Precaución</strong>
+          <strong *ngIf="getAlertLevel() === 'safe'">Seguro</strong>
+          <p>{{ getSelectedMedication()?.warning }}</p>
+          <p *ngIf="isContraindicated()" class="contraindication-note">
+            Este medicamento NO debe usarse en pacientes con {{ patientData?.renal_stage }}.
+            Por favor seleccione una alternativa.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campo: Dosis -->
+    <div class="form-field" *ngIf="medicationData.medication">
+      <label for="dose" class="field-label">
+        Dosis Estándar
+        <span class="required">*</span>
+      </label>
+      <div class="input-with-tooltip">
+        <div class="input-wrapper">
+          <input 
+            type="number" 
+            id="dose"
+            [(ngModel)]="medicationData.dose"
+            name="dose"
+            min="1"
+            max="10000"
+            step="1"
+            required
+            class="form-input"
+            placeholder="500">
+          <span class="input-unit">mg</span>
+        </div>
+        <div class="tooltip-icon" title="Dosis estándar del medicamento en miligramos">
+          ❓
+        </div>
+      </div>
+      <small class="field-hint">Ingrese la dosis estándar (será ajustada automáticamente)</small>
+    </div>
+
+    <!-- Campo: Vía de administración -->
+    <div class="form-field" *ngIf="medicationData.medication">
+      <label for="route" class="field-label">
+        Vía de Administración
+        <span class="required">*</span>
+      </label>
+      <div class="input-with-tooltip">
+        <select 
+          id="route"
+          [(ngModel)]="medicationData.route"
+          name="route"
+          required
+          class="form-select">
+          <option *ngFor="let route of routes" [value]="route.value">
+            {{ route.label }}
+          </option>
+        </select>
+        <div class="tooltip-icon" title="Vía por la cual se administrará el medicamento">
+          ❓
+        </div>
+      </div>
+    </div>
+
+    <!-- Ajuste de dosis calculado -->
+    <div class="dose-adjustment" *ngIf="medicationData.medication && medicationData.dose > 0 && !isContraindicated()">
+      <div class="adjustment-header">
+        <h3>🧮 Ajuste de Dosis por Función Renal</h3>
+      </div>
+
+      <div class="adjustment-comparison">
+        <div class="dose-card standard">
+          <div class="dose-label">Dosis Estándar</div>
+          <div class="dose-value">{{ medicationData.dose }} mg</div>
+          <div class="dose-note">100%</div>
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="dose-card adjusted" [ngClass]="getAlertLevel()">
+          <div class="dose-label">Dosis Ajustada</div>
+          <div class="dose-value">{{ getAdjustedDose() }} mg</div>
+          <div class="dose-note">{{ getAdjustmentPercentage() }}%</div>
+        </div>
+      </div>
+
+      <div class="adjustment-explanation">
+        <p>
+          <strong>Motivo del ajuste:</strong> 
+          Paciente con {{ patientData?.renal_stage }} 
+          (TFG: {{ patientData?.calculated_gfr }} mL/min).
+          La dosis se reduce a {{ getAdjustmentPercentage() }}% para prevenir acumulación
+          y toxicidad del medicamento.
+        </p>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-secondary"
+        (click)="onBack()">
+        ← Volver a Datos del Paciente
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="!isValid() || isContraindicated()">
+        Siguiente: Configuración →
+      </button>
+    </div>
+
+  </form>
+
+  <!-- Resumen -->
+  <div class="data-preview" *ngIf="isValid() && !isContraindicated()">
+    <h4>📋 Resumen de Medicación:</h4>
+    <ul>
+      <li><strong>Medicamento:</strong> {{ getSelectedMedication()?.name }}</li>
+      <li><strong>Dosis Ajustada:</strong> {{ getAdjustedDose() }} mg ({{ getAdjustmentPercentage() }}%)</li>
+      <li><strong>Vía:</strong> {{ getSelectedRoute() }}</li>
+      <li><strong>Vida Media:</strong> {{ getSelectedMedication()?.half_life }} horas</li>
+    </ul>
+  </div>
+
+</div>

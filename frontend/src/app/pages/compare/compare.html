@@ -1,0 +1,171 @@
+<!--src/app/pages/compare/compare.html-->
+
+<div class="compare-page">
+  
+  <div class="page-header">
+    <button class="btn-back" (click)="backToHistory()">
+      ← Volver al Historial
+    </button>
+    <h1>👥 Comparación de Pacientes</h1>
+    <p>Análisis comparativo de dos simulaciones farmacocinéticas</p>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando comparación...</p>
+  </div>
+
+  <div class="comparison-container" *ngIf="!loading && simulation1 && simulation2">
+    
+    <!-- Tarjetas de Pacientes -->
+      <div class="patients-cards">
+      
+      <div class="patient-card patient-a">
+        <div class="card-header">
+          <h3>👤 Paciente A</h3>
+        </div>
+        <div class="card-body">
+          <div class="info-row">
+            <span class="label">Peso:</span>
+            <span class="value">{{ simulation1.patient_weight }} kg</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Edad:</span>
+            <span class="value">{{ simulation1.patient_age }} años</span>
+          </div>
+          <div class="info-row">
+            <span class="label">TFG:</span>
+            <span class="value">{{ simulation1.calculated_gfr || '--' }} mL/min</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Estadio:</span>
+            <span class="badge">{{ getRenalStage(simulation1) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Medicamento:</span>
+            <span class="value">{{ getMedicationName(simulation1) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Dosis:</span>
+            <span class="value">{{ simulation1.dose_administered }} mg</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="vs-divider">
+        <div class="vs-circle">VS</div>
+      </div>
+
+      <div class="patient-card patient-b">
+        <div class="card-header">
+          <h3>👤 Paciente B</h3>
+        </div>
+        <div class="card-body">
+          <div class="info-row">
+            <span class="label">Peso:</span>
+            <span class="value">{{ simulation2.patient_weight }} kg</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Edad:</span>
+            <span class="value">{{ simulation2.patient_age }} años</span>
+          </div>
+          <div class="info-row">
+            <span class="label">TFG:</span>
+            <span class="value">{{ simulation2.calculated_gfr || '--' }} mL/min</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Estadio:</span>
+            <span class="badge">{{ getRenalStage(simulation2) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Medicamento:</span>
+            <span class="value">{{ getMedicationName(simulation2) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Dosis:</span>
+            <span class="value">{{ simulation2.dose_administered }} mg</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Tabla Comparativa -->
+      <div class="comparison-table">
+      <h3>📊 Diferencias Clave</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Parámetro</th>
+            <th>Paciente A</th>
+            <th>Paciente B</th>
+            <th>Diferencia</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Peso</td>
+            <td>{{ simulation1.patient_weight }} kg</td>
+            <td>{{ simulation2.patient_weight }} kg</td>
+            <td [class.positive]="simulation2.patient_weight > simulation1.patient_weight"
+                [class.negative]="simulation2.patient_weight < simulation1.patient_weight">
+              {{ getDifference(simulation1.patient_weight, simulation2.patient_weight) }}%
+            </td>
+          </tr>
+          <tr>
+            <td>TFG</td>
+            <td>{{ simulation1.calculated_gfr || '--' }} mL/min</td>
+            <td>{{ simulation2.calculated_gfr || '--' }} mL/min</td>
+            <td [class.positive]="(simulation2.calculated_gfr || 0) > (simulation1.calculated_gfr || 0)"
+                [class.negative]="(simulation2.calculated_gfr || 0) < (simulation1.calculated_gfr || 0)">
+              {{ getDifference(simulation1.calculated_gfr || 0, simulation2.calculated_gfr || 0) }}%
+            </td>
+          </tr>
+          <tr>
+            <td>Concentración Inicial</td>
+            <td>{{ getC0(simulation1).toFixed(2) }} mg/L</td>
+            <td>{{ getC0(simulation2).toFixed(2) }} mg/L</td>
+            <td [class.positive]="getC0(simulation2) > getC0(simulation1)"
+                [class.negative]="getC0(simulation2) < getC0(simulation1)">
+              {{ getDifference(getC0(simulation1), getC0(simulation2)) }}%
+            </td>
+          </tr>
+          <tr>
+            <td>Vida Media</td>
+            <td>{{ getHalfLife(simulation1) }} horas</td>
+            <td>{{ getHalfLife(simulation2) }} horas</td>
+            <td [class.positive]="getHalfLife(simulation2) > getHalfLife(simulation1)"
+                [class.negative]="getHalfLife(simulation2) < getHalfLife(simulation1)">
+              {{ getDifference(getHalfLife(simulation1), getHalfLife(simulation2)) }}%
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Conclusiones -->
+    <div class="conclusions">
+      <h3>💡 Conclusiones</h3>
+      <ul>
+        <li>
+          <strong>Función Renal:</strong> 
+          El Paciente B tiene {{ getRenalStage(simulation2) }} comparado con el Paciente A ({{ getRenalStage(simulation1) }})
+        </li>
+        <li>
+          <strong>Concentración:</strong>
+          La concentración inicial del Paciente A es 
+          {{ getDifference(getC0(simulation2), getC0(simulation1)) }}% 
+          {{ getC0(simulation1) > getC0(simulation2) ? 'mayor' : 'menor' }}
+        </li>
+        <li>
+          <strong>Eliminación:</strong>
+          {{ getHalfLife(simulation1) < getHalfLife(simulation2) ? 
+             'El Paciente A elimina el medicamento más rápido' : 
+             'El Paciente B elimina el medicamento más rápido' }}
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+</div>

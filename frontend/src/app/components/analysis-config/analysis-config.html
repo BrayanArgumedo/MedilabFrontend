@@ -1,0 +1,167 @@
+<!--src/app/components/analysis-config/analysis-config.html-->
+<div class="analysis-config">
+  
+  <!-- Header -->
+  <div class="form-header">
+    <h2>⚙️ Configuración del Análisis</h2>
+    <p class="form-description">
+      Configure los parámetros de la simulación farmacocinética
+    </p>
+  </div>
+
+  <!-- Resumen de pasos anteriores -->
+  <div class="previous-steps-summary">
+    <div class="step-card" *ngIf="patientData">
+      <div class="step-icon">👤</div>
+      <div class="step-info">
+        <strong>Paciente</strong>
+        <span>{{ patientData.weight }}kg, TFG: {{ patientData.calculated_gfr }} mL/min</span>
+      </div>
+    </div>
+
+    <div class="step-card" *ngIf="medicationData">
+      <div class="step-icon">💊</div>
+      <div class="step-info">
+        <strong>Medicamento</strong>
+        <span>{{ medicationData.medication }}, {{ medicationData.dose }}mg</span>
+      </div>
+    </div>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" class="form-content">
+    
+    <!-- Campo: Tiempo a Simular -->
+    <div class="form-field">
+      <label for="timeToSimulate" class="field-label">
+        Tiempo a Simular
+        <span class="required">*</span>
+      </label>
+      <div class="input-with-tooltip">
+        <div class="slider-wrapper">
+          <input 
+            type="range" 
+            id="timeToSimulate"
+            [(ngModel)]="configData.timeToSimulate"
+            name="timeToSimulate"
+            min="1"
+            max="48"
+            step="1"
+            class="slider">
+          <div class="slider-value">
+            {{ configData.timeToSimulate }} horas
+          </div>
+        </div>
+        <div class="tooltip-icon" title="Periodo de tiempo para simular la concentración del medicamento en sangre">
+          ❓
+        </div>
+      </div>
+      <small class="field-hint">Desliza para seleccionar entre 1 y 48 horas</small>
+    </div>
+
+    <!-- Campo: Resolución/Precisión -->
+    <div class="form-field">
+      <label class="field-label">
+        Precisión del Cálculo
+        <span class="required">*</span>
+      </label>
+      
+      <div class="resolution-options">
+        <div 
+          *ngFor="let option of resolutionOptions"
+          class="resolution-card"
+          [class.selected]="configData.resolution === option.value"
+          (click)="configData.resolution = option.value">
+          
+          <div class="resolution-icon">{{ option.icon }}</div>
+          <div class="resolution-label">{{ option.label }}</div>
+          <div class="resolution-points">{{ option.points }} puntos</div>
+          <div class="resolution-description">{{ option.description }}</div>
+          
+          <div class="selection-indicator" *ngIf="configData.resolution === option.value">
+            ✓
+          </div>
+        </div>
+      </div>
+
+      <div class="resolution-info">
+        <p>
+          <strong>Puntos calculados:</strong> {{ getNumPoints() }}
+          <br>
+          <strong>Tiempo estimado:</strong> {{ getEstimatedTime() }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Opciones adicionales -->
+    <div class="form-field">
+      <label class="field-label">Opciones de Visualización</label>
+      
+      <div class="checkbox-group">
+        
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="configData.showTherapeuticLevels"
+            name="showTherapeuticLevels">
+          <span class="checkbox-text">
+            <strong>Mostrar niveles terapéuticos</strong>
+            <small>Muestra las líneas de nivel mínimo y máximo en la gráfica</small>
+          </span>
+        </label>
+
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="configData.showProcedure"
+            name="showProcedure">
+          <span class="checkbox-text">
+            <strong>Mostrar procedimiento matemático</strong>
+            <small>Incluye el desarrollo paso a paso de los cálculos</small>
+          </span>
+        </label>
+
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            [(ngModel)]="configData.saveToHistory"
+            name="saveToHistory">
+          <span class="checkbox-text">
+            <strong>Guardar en historial</strong>
+            <small>Permite comparar con simulaciones futuras</small>
+          </span>
+        </label>
+
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-secondary"
+        (click)="onBack()">
+        ← Volver a Medicamento
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="!isValid()">
+        🧮 Calcular Simulación
+      </button>
+    </div>
+
+  </form>
+
+  <!-- Resumen de configuración -->
+  <div class="data-preview" *ngIf="isValid()">
+    <h4>📋 Resumen de Configuración:</h4>
+    <ul>
+      <li><strong>Tiempo de simulación:</strong> {{ configData.timeToSimulate }} horas</li>
+      <li><strong>Precisión:</strong> {{ getSelectedResolution()?.label }} ({{ getNumPoints() }} puntos)</li>
+      <li><strong>Niveles terapéuticos:</strong> {{ configData.showTherapeuticLevels ? 'Sí' : 'No' }}</li>
+      <li><strong>Procedimiento matemático:</strong> {{ configData.showProcedure ? 'Sí' : 'No' }}</li>
+      <li><strong>Guardar en historial:</strong> {{ configData.saveToHistory ? 'Sí' : 'No' }}</li>
+    </ul>
+  </div>
+
+</div>
